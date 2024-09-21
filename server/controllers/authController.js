@@ -1,8 +1,6 @@
+const { hashPassword, comparePassword } = require("../helpers/authHelper")
 const UserModel = require("../models/userModel")
 
-module.exports.test = (req, res) => {
-    res.json("test is working")
-}
 module.exports.registerUser = async (req, res) => {
     try{
      const {name, email, password} = req.body
@@ -23,13 +21,39 @@ module.exports.registerUser = async (req, res) => {
             error : "Email is taken already"
         })
      }
+     const hashedPassword = await hashPassword(password)
      const user = await UserModel.create({
         name : name,
         email : email,
-        password : password
+        password : hashedPassword
      })
      return res.json(user)
     }catch(error){
         console.log(error)
     }
+}
+module.exports.loginUser = async(req, res) => {
+   try {
+    const {email, password} = req.body
+    const user = await UserModel.findOne({email})
+    // Check if user exists
+    if(!user){
+        return res.json({
+            error : "No user found!"
+        })
+    }
+    const match = await comparePassword(password, user.password)
+    if(match){
+        res.json({
+        message : 'Login Success!'
+    })
+    }
+    else{
+        res.json({
+            error: "Wrong password!"
+        })
+    }
+   } catch (error) {
+        console.log(error)
+   } 
 }
