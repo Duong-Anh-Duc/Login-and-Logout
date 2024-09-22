@@ -19,9 +19,9 @@ const Login = () => {
       if (data.error) {
         toast.error(data.error);
       } else {
-        toast.success(data.message);
+        toast.success("Login Success!");
         setData({});
-        navigate("/");
+        navigate("/dashboard");
       }
     } catch (error) {}
   };
